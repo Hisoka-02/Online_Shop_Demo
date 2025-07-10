@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Shop</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <nav>
+  <a href="/">Online Shop</a>
+  <a href="/admin.html">Admin-Bereich</a>
+  <!-- weitere Links hier -->
+</nav>
+
+    <header>
+        <h1>🛍️ Mein Shop</h1>
+    </header>
+
+    <div class="container">
+        <div id="product-list">
+            <!-- Produkte werden hier geladen -->
+        </div>
+
+        <div class="cart">
+            <h3>🛒 Warenkorb</h3>
+            <div id="cart-items"></div>
+            <p class="total">Gesamt: <span id="total-price">0</span> €</p>
+            <button id="checkout-button">
+                Zur Kasse
+            </button>
+        </div>
+    </div>
+
+    <!-- Lightbox Galerie -->
+    <div id="lightbox" class="lightbox" onclick="closeLightbox(event)">
+        <span class="close">&times;</span>
+        <img id="lightbox-img" src="" />
+        <div class="lightbox-controls">
+            <button onclick="prevImage(event)">❮</button>
+            <button onclick="nextImage(event)">❯</button>
+        </div>
+    </div>
+
+    <script>
+        let products = JSON.parse(localStorage.getItem('products')) || [];
+        let cart = [];
+
+        function displayProducts() {
+            const container = document.getElementById('product-list');
+            container.innerHTML = "";
+            products.forEach((p, i) => {
+                const div = document.createElement('div');
+                div.className = "product";
+                div.innerHTML = `
+        <div class="product-row">
+          <img src="${p.images?.[0] || p.image}" alt="${p.name}" onclick='openLightbox(${JSON.stringify(p.images || [p.image])}, 0)' />
+          <div class="product-description">
+            <h2>${p.name}</h2>
+            <p>${p.description}</p>
+          </div>
+          <div class="product-actions">
+            <p><strong>${p.price.toFixed(2)} €</strong></p>
+            <button onclick="addToCart(${i})">In den Warenkorb</button>
+          </div>
+        </div>
+      `;
+                container.appendChild(div);
+            });
+        }
+
+        function addToCart(index) {
+            const existing = cart.find(item => item.name === products[index].name);
+            if (existing) {
+                existing.quantity++;
+            } else {
+                cart.push({ ...products[index], quantity: 1 });
+            }
+            updateCart();
+        }
+
+       function updateCart() {
+    const cartContainer = document.getElementById('cart-items');
+    cartContainer.innerHTML = "";
+    let total = 0;
+
+    cart.forEach((item, i) => {
+        const div = document.createElement('div');
+        div.className = "cart-item";
+        div.innerHTML = `
+      <div>
+        <b>${item.name}</b><br />
+        <small>${item.price.toFixed(2)} € x ${item.quantity}</small>
+      </div>
+      <div class="cart-controls">
+        <button onclick="changeQty(${i}, -1)">➖</button>
+        <button onclick="changeQty(${i}, 1)">➕</button>
+        <button class="delete" onclick="removeItem(${i})">🗑️</button>
+      </div>
+    `;
+        cartContainer.appendChild(div);
+        total += item.price * item.quantity;
+    });
+
+    document.getElementById('total-price').textContent = total.toFixed(2);
+
+    // Zeige oder verstecke den Checkout-Button je nach Warenkorbgröße
+    const checkoutBtn = document.getElementById('checkout-button');
+    if (cart.length > 0) {
+        checkoutBtn.style.display = 'block';
+    } else {
+        checkoutBtn.style.display = 'none';
+    }
+}
+
+
+        function changeQty(index, amount) {
+            cart[index].quantity += amount;
+            if (cart[index].quantity <= 0) {
+                cart.splice(index, 1);
+            }
+            updateCart();
+        }
+
+        function removeItem(index) {
+            cart.splice(index, 1);
+            updateCart();
+        }
+
+        displayProducts();
+
+        // Lightbox Logik
+        let currentImages = [];
+        let currentIndex = 0;
+
+        function openLightbox(images, index) {
+            currentImages = images;
+            currentIndex = index;
+            document.getElementById('lightbox-img').src = currentImages[currentIndex];
+            document.getElementById('lightbox').style.display = 'flex';
+        }
+
+        function closeLightbox(e) {
+            if (e.target.classList.contains('lightbox') || e.target.classList.contains('close')) {
+                document.getElementById('lightbox').style.display = 'none';
+            }
+        }
+
+        function nextImage(e) {
+            e.stopPropagation();
+            currentIndex = (currentIndex + 1) % currentImages.length;
+            document.getElementById('lightbox-img').src = currentImages[currentIndex];
+        }
+
+        function prevImage(e) {
+            e.stopPropagation();
+            currentIndex = (currentIndex - 1 + currentImages.length) % currentImages.length;
+            document.getElementById('lightbox-img').src = currentImages[currentIndex];
+        }
+
+        document.getElementById('checkout-button').addEventListener('click', () => {
+    // Warenkorb im localStorage speichern für die Checkout-Seite
+    localStorage.setItem('cart', JSON.stringify(cart));
+    // Weiterleitung zur Checkout-Seite
+    window.location.href = 'checkout.html';
+});
+
+    </script>
+
+</body>
+
+</html>

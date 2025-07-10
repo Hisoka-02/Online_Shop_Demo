@@ -1,0 +1,401 @@
+body {
+  margin: 0;
+  padding: 0;
+  background: #f2f2f2;
+  color: #333;
+}
+
+header {
+  background: #0078D4;
+  color: white;
+  padding: 20px;
+  text-align: center;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  gap: 20px;
+  padding: 20px;
+  max-width: 1200px;
+  margin: auto;
+}
+
+/* Produktkarte: flex Container mit Bild + Details + Aktionen */
+.product {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.product-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 15px;
+}
+
+.product img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 5px;
+  flex-shrink: 0;
+}
+
+/* Linker Bereich: Name + Beschreibung */
+.product-description {
+  flex: 1;
+  padding-left: 15px;
+  text-align: left;
+}
+
+.product-description h2 {
+  margin: 0;
+  font-size: 1.1em;
+}
+
+.product-description p {
+  margin: 5px 0;
+  font-size: 0.95em;
+  color: #555;
+}
+
+/* Rechter Bereich: Preis + Button */
+.product-actions {
+  min-width: 140px;
+  /* feste Breite */
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.product-actions p {
+  margin: 0 0 10px 0;
+  font-weight: bold;
+  font-size: 1em;
+}
+
+.product-actions button {
+  background: #0078D4;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 5px;
+  width: 100%;
+}
+
+.product-actions button:hover {
+  background: #005ea6;
+}
+
+/* Warenkorb */
+.cart {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 20px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.cart h3 {
+  margin-top: 0;
+}
+
+.cart-item {
+  display: flex;
+  justify-content: space-between;
+  margin: 10px 0;
+  align-items: center;
+  gap: 10px;
+}
+
+.cart-item>div:last-child {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.cart-item button {
+  background: transparent;
+  border: none;
+  color: #0078D4;
+  font-weight: bold;
+  font-size: 1.2em;
+  cursor: pointer;
+  padding: 0 8px;
+  margin-left: 5px;
+  min-width: auto;
+  transition: color 0.3s ease;
+  vertical-align: middle;
+}
+
+.cart-item button:hover {
+  color: #005ea6;
+  background: transparent;
+}
+
+.cart-item button.delete {
+  color: #d9534f;
+  font-size: 1em;
+  margin-left: 10px;
+}
+
+.cart-item button.delete:hover {
+  color: #b52b27;
+}
+
+.total {
+  font-weight: bold;
+  margin-top: 20px;
+  font-size: 1.2em;
+  text-align: right;
+}
+
+/* Admin-Login & Panel */
+#login,
+#adminPanel {
+  background: white;
+  max-width: 400px;
+  margin: 50px auto;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+#login h2,
+#adminPanel h2 {
+  margin-top: 0;
+  color: #0078D4;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="number"],
+input[type="file"] {
+  width: 95%;
+  padding: 10px;
+  margin-top: 8px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+button {
+  background: #0078D4;
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  width: 100%;
+}
+
+button:hover {
+  background: #005ea6;
+}
+
+#error {
+  color: red;
+  margin-top: 10px;
+}
+
+#success {
+  color: green;
+  margin-top: 10px;
+}
+
+/* Galerie Overlay */
+#gallery-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.gallery-box {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 90%;
+  max-height: 90%;
+  overflow: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  position: relative;
+}
+
+.gallery-box img {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+.close-gallery {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #0078D4;
+}
+
+/* Lightbox */
+.lightbox {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.9);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  flex-direction: column;
+}
+
+.lightbox img {
+  max-width: 90%;
+  max-height: 80vh;
+  border-radius: 10px;
+}
+
+.lightbox .close {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  font-size: 30px;
+  color: white;
+  cursor: pointer;
+}
+
+.lightbox-controls {
+  position: absolute;
+  bottom: 30px;
+  display: flex;
+  gap: 20px;
+}
+
+.lightbox-controls button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 2em;
+  cursor: pointer;
+}
+
+.lightbox-controls button:hover {
+  color: #0078D4;
+}
+
+nav {
+  background-color: #333;
+  padding: 10px;
+  position: fixed;
+  width: 100%;
+  top: 0%;
+}
+
+nav a {
+  color: white;
+  margin-right: 15px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+nav a:hover {
+  text-decoration: underline;
+}
+
+#adminPanel {
+  margin-top: 20px;
+}
+
+#productList .product {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 15px;
+}
+
+#productList img {
+  max-width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+button {
+  cursor: pointer;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  background-color: #007bff;
+  color: white;
+  margin-top: 5px;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+button[style*="background:red"] {
+  background-color: #dc3545;
+}
+
+button[style*="background:red"]:hover {
+  background-color: #a71d2a;
+}
+
+input,
+button {
+  font-size: 1rem;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="password"] {
+  padding: 8px;
+  margin: 5px 0;
+  width: calc(100% - 40px);
+  box-sizing: border-box;
+}
+
+#passwordContainer {
+  position: relative;
+  width: 110%;
+}
+
+#togglePassword {
+  position: absolute;
+  left: 160px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+}
+
+#error {
+  color: red;
+  margin-top: 5px;
+}
+
+#success {
+  color: green;
+  margin-top: 5px;
+}

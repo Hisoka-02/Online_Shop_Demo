@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Admin - Bestellungen</title>
+<link rel="stylesheet" href="style_b.css">
+</head>
+<body>
+
+<h1>Admin: Alle Bestellungen</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Datum</th>
+      <th>Status</th>
+      <th>Kunde</th>
+      <th>Adresse</th>
+      <th>Telefon / Email</th>
+      <th>Zahlung</th>
+      <th>Warenkorb</th>
+    </tr>
+  </thead>
+  <tbody id="ordersTableBody"></tbody>
+</table>
+
+<script>
+  async function loadOrders() {
+    try {
+      const res = await fetch('/api/orders', { credentials: 'include' });
+      if (!res.ok) {
+        if (res.status === 401) {
+          alert('Nicht autorisiert. Bitte im Admin-Bereich einloggen.');
+        } else {
+          alert('Fehler beim Laden der Bestellungen.');
+        }
+        return;
+      }
+      const orders = await res.json();
+      const tbody = document.getElementById('ordersTableBody');
+      tbody.innerHTML = '';
+
+      orders.forEach(order => {
+        const cartList = order.cart.map(item => {
+          return `<li>${item.name} - Menge: ${item.quantity} - Preis: ${item.price} €</li>`;
+        }).join('');
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${order.id}</td>
+          <td>${new Date(order.date).toLocaleString()}</td>
+          <td>${order.status}</td>
+          <td>${order.firstname} ${order.lastname}</td>
+          <td>
+            ${order.street} ${order.housenumber}<br/>
+            ${order.postalcode} ${order.city}
+          </td>
+          <td>
+            ${order.phone}<br/>
+            <a href="mailto:${order.email}">${order.email}</a>
+          </td>
+          <td>${order.payment}</td>
+          <td><ul class="small">${cartList}</ul></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    } catch (error) {
+      alert('Fehler: ' + error.message);
+    }
+  }
+
+  loadOrders();
+</script>
+
+</body>
+</html>

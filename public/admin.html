@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Bereich</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav id="adminNav">
+  <a href="index.html">Online Shop</a>
+  <a href="admin_b.html" id="ordersLink" style="display:none;">Bestellungen</a>
+  <a href="#" onclick="logout()" id="logoutLink" style="display:none;">Logout</a>
+</nav>
+
+  <header>
+    <h1>🛠️ Admin Bereich</h1>
+  </header>
+
+  <div id="login">
+    <h2>Admin Login</h2>
+    <div id="passwordContainer">
+      <input type="text" id="username" placeholder="Benutzername" />
+      <input type="password" id="password" placeholder="Passwort eingeben" />
+      <button id="togglePassword" onclick="togglePassword()">👁️</button>
+    </div>
+    <button onclick="checkPassword()">Login</button>
+    <p id="error" style="color:red;"></p>
+  </div>
+
+  <div id="adminPanel" style="display: none;">
+    <h2>Artikel hinzufügen</h2>
+    <input type="text" id="name" placeholder="Produktname" />
+    <input type="number" id="price" placeholder="Preis (€)" />
+    <input type="text" id="description" placeholder="Beschreibung" />
+    <input type="file" id="image" accept="image/*" multiple />
+    <button onclick="addProduct()">Hinzufügen</button>
+    <p id="success" style="color:green;"></p>
+
+    <hr />
+    <h2>Bestehende Artikel</h2>
+    <div id="productList"></div>
+  </div>
+
+<script>
+  async function checkPassword() {
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value;
+
+    if (!username || !password) {
+      document.getElementById("error").textContent = "Bitte Benutzername und Passwort eingeben.";
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',  // wichtig für Cookies!
+        body: JSON.stringify({ username, password })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        document.getElementById("error").textContent = data.error || 'Login fehlgeschlagen.';
+        return;
+      }
+
+      // Login erfolgreich
+      localStorage.setItem("adminLoggedIn", "true");
+      document.getElementById("error").textContent = "";
+      showAdminPanel();
+
+    } catch (err) {
+      document.getElementById("error").textContent = "Serverfehler, bitte später erneut versuchen.";
+    }
+  }
+
+  function showAdminPanel() {
+    document.getElementById("login").style.display = "none";
+    document.getElementById("adminPanel").style.display = "block";
+    document.getElementById("ordersLink").style.display = "inline";
+    document.getElementById("logoutLink").style.display = "inline";
+    loadProducts();
+  }
+
+  async function logout() {
+    try {
+      await fetch('/api/admin/logout', {
+        method: 'POST',
+        credentials: 'include'
+      });
+    } catch(e) {
+      // ignore
+    }
+    localStorage.removeItem("adminLoggedIn");
+    document.getElementById("adminPanel").style.display = "none";
+    document.getElementById("login").style.display = "block";
+    document.getElementById("ordersLink").style.display = "none";
+    document.getElementById("logoutLink").style.display = "none";
+    document.getElementById("username").value = "";
+    document.getElementById("password").value = "";
+    document.getElementById("error").textContent = "";
+    document.getElementById("success").textContent = "";
+  }
+
+  function togglePassword() {
+    const passInput = document.getElementById("password");
+    const toggleBtn = document.getElementById("togglePassword");
+    if (passInput.type === "password") {
+      passInput.type = "text";
+      toggleBtn.textContent = "🙈";
+    } else {
+      passInput.type = "password";
+      toggleBtn.textContent = "👁️";
+    }
+  }
+
+  window.onload = () => {
+    const loggedIn = localStorage.getItem("adminLoggedIn") === "true";
+    if (loggedIn) {
+      showAdminPanel();
+    }
+  };
+
+  // Der Rest bleibt unverändert (addProduct, loadProducts, etc.)
+
+  function addProduct() {
+    const name = document.getElementById("name").value.trim();
+    const price = parseFloat(document.getElementById("price").value);
+    const description = document.getElementById("description").value.trim();
+    const imageInput = document.getElementById("image");
+    const files = Array.from(imageInput.files);
+
+    if (!name || isNaN(price) || !description || files.length === 0) {
+      alert("Bitte alle Felder korrekt ausfüllen.");
+      return;
+    }
+
+    const readers = files.map(file => {
+      return new Promise(resolve => {
+        const reader = new FileReader();
+        reader.onload = e => resolve(e.target.result);
+        reader.readAsDataURL(file);
+      });
+    });
+
+    Promise.all(readers).then(images => {
+      const products = JSON.parse(localStorage.getItem("products")) || [];
+      products.push({ name, price, description, images });
+      localStorage.setItem("products", JSON.stringify(products));
+      document.getElementById("success").textContent = "✅ Produkt hinzugefügt!";
+      clearForm();
+      loadProducts();
+    });
+  }
+
+  function clearForm() {
+    document.getElementById("name").value = "";
+    document.getElementById("price").value = "";
+    document.getElementById("description").value = "";
+    document.getElementById("image").value = "";
+  }
+
+  function loadProducts() {
+    const container = document.getElementById("productList");
+    const products = JSON.parse(localStorage.getItem("products")) || [];
+    container.innerHTML = "";
+    products.forEach((p, index) => {
+      const div = document.createElement("div");
+      div.className = "product";
+      div.innerHTML = `
+        <img src="${p.images?.[0] || ''}" alt="Produktbild" />
+        <h2>${p.name}</h2>
+        <p>${p.description}</p>
+        <p><b>Preis:</b> ${p.price.toFixed(2)} €</p>
+        <button onclick="editProduct(${index})">Bearbeiten</button>
+        <button onclick="deleteProduct(${index})" style="background:red;">Löschen</button>
+      `;
+      container.appendChild(div);
+    });
+  }
+
+  function deleteProduct(index) {
+    if (!confirm("Bist du sicher, dass du dieses Produkt löschen willst?")) return;
+    const products = JSON.parse(localStorage.getItem("products")) || [];
+    products.splice(index, 1);
+    localStorage.setItem("products", JSON.stringify(products));
+    loadProducts();
+  }
+
+  function editProduct(index) {
+    const products = JSON.parse(localStorage.getItem("products")) || [];
+    const p = products[index];
+    const name = prompt("Name ändern:", p.name);
+    const price = prompt("Preis ändern:", p.price);
+    const description = prompt("Beschreibung ändern:", p.description);
+
+    if (name && price && description) {
+      products[index] = {
+        ...p,
+        name: name.trim(),
+        price: parseFloat(price),
+        description: description.trim()
+      };
+      localStorage.setItem("products", JSON.stringify(products));
+      loadProducts();
+    }
+  }
+
+  // ENTER-Taste im Passwortfeld aktiviert Login
+  document.getElementById("password").addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+      checkPassword();
+    }
+  });
+</script>
+</body>
+</html>

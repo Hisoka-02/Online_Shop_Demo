@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Checkout</title>
+<link rel="stylesheet" href="style_b.css" />
+</head>
+<body>
+
+<h1>Checkout</h1>
+
+<form id="checkoutForm">
+  <label for="firstname">Vorname *</label>
+  <input type="text" id="firstname" name="firstname" required />
+
+  <label for="lastname">Nachname *</label>
+  <input type="text" id="lastname" name="lastname" required />
+
+  <label for="street">Straße *</label>
+  <input type="text" id="street" name="street" required />
+
+  <label for="housenumber">Hausnummer *</label>
+  <input type="text" id="housenumber" name="housenumber" required />
+
+  <label for="postalcode">PLZ *</label>
+  <input type="text" id="postalcode" name="postalcode" pattern="[0-9]{5}" title="Bitte 5-stellige PLZ eingeben" required />
+
+  <label for="city">Stadt *</label>
+  <input type="text" id="city" name="city" required />
+
+  <label for="phone">Telefon *</label>
+  <input type="tel" id="phone" name="phone" pattern="[\d\s\+\-]+" title="Bitte gültige Telefonnummer eingeben" required />
+
+  <label for="email">E-Mail *</label>
+  <input type="email" id="email" name="email" required />
+
+  <label for="payment">Zahlungsmethode *</label>
+  <select id="payment" name="payment" required>
+    <option value="">Bitte wählen</option>
+    <option value="paypal">PayPal</option>
+    <option value="creditcard">Kreditkarte</option>
+    <option value="invoice">Rechnung</option>
+  </select>
+
+  <button type="submit">Kauf abschließen</button>
+</form>
+
+<script>
+  const form = document.getElementById('checkoutForm');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    // Hol dir den Warenkorb aus localStorage (als Beispiel, passe an deine Struktur an)
+    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+
+    if (cart.length === 0) {
+      alert('Ihr Warenkorb ist leer.');
+      return;
+    }
+
+    const data = {
+      firstname: form.firstname.value.trim(),
+      lastname: form.lastname.value.trim(),
+      street: form.street.value.trim(),
+      housenumber: form.housenumber.value.trim(),
+      postalcode: form.postalcode.value.trim(),
+      city: form.city.value.trim(),
+      phone: form.phone.value.trim(),
+      email: form.email.value.trim(),
+      payment: form.payment.value,
+      cart: cart,
+    };
+
+    try {
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      if (res.ok) {
+        alert('Danke für Ihre Bestellung!');
+        localStorage.removeItem('cart');
+        window.location.href = '/';
+      } else {
+        const errorData = await res.json();
+        alert('Fehler bei der Bestellung: ' + (errorData.error || 'Unbekannter Fehler'));
+      }
+    } catch (error) {
+      alert('Fehler bei der Bestellung: ' + error.message);
+    }
+  });
+</script>
+
+</body>
+</html>
