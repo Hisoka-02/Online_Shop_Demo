@@ -85,17 +85,4 @@ node server.js
 
 🟡 Das Projekt ist funktional, wird aber noch weiterentwickelt (Admin-Bestellverwaltung, Suchfunktion, Filter, etc.).
 
----
 
-## 📄 Lizenz
-
-MIT – frei für Lern- & Demonstrationszwecke.
-
-```
-
----
-
-### ✅ Möchtest du، أن أرفق هذا النص أيضًا في مجلد `README.md` داخل مشروعك؟
-أو نبدأ بـ Projekt 3؟  
-قل فقط: **„README speichern“** أو **„Projekt 3 bitte“** 💙
-```
