@@ -85,4 +85,4 @@ node server.js
 
 🟡 Das Projekt ist funktional, wird aber noch weiterentwickelt (Admin-Bestellverwaltung, Suchfunktion, Filter, etc.).
 
-
+---
