@@ -1,4 +1,3 @@
-````markdown
 # 🛒 Online Shop – Webbasierte Produkt- & Bestellverwaltung
 
 Ein vollständiger Online-Shop mit Adminbereich, Warenkorb, Produkt-Upload inkl. Bild, Checkout-Prozess und sicherem Login.
